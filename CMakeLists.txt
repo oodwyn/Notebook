@@ -3,4 +3,8 @@ project(Lab2_Notebook)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Lab2_Notebook main.cpp)
+add_executable(Lab2_Notebook main.cpp
+        Note.cpp
+        Note.h
+        Keeper.h
+        Keeper.cpp)

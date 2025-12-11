@@ -2,7 +2,7 @@
 
 // Конструктор без параметров
 Note::Note() {
-    cout << "Вызван конструктор без параметров для объекта Note" << endl;
+    std::cout << "Вызван конструктор без параметров для объекта Note" << std::endl;
     firstName="";
     lastName="";
     phoneNumber="";
@@ -12,8 +12,8 @@ Note::Note() {
 }
 
 // Конструктор с параметрами
-Note::Note(string fName, string lName, string phone, int day, int month, int year) {
-    cout << "Вызван конструктор с параметрами для объекта Node" << endl;
+Note::Note(std::string fName, std::string lName, std::string phone, int day, int month, int year) {
+    std::cout << "Вызван конструктор с параметрами для объекта Node" << std::endl;
     firstName = fName;
     lastName = lName;
     phoneNumber = phone;
@@ -24,7 +24,7 @@ Note::Note(string fName, string lName, string phone, int day, int month, int yea
 
 // Конструктор копирования
 Note::Note(const Note& other) {
-    cout << "Вызван конструктор копирования для объекта Note" << endl;
+    std::cout << "Вызван конструктор копирования для объекта Note" << std::endl;
     firstName = other.firstName;
     lastName = other.lastName;
     phoneNumber = other.phoneNumber;
@@ -35,7 +35,7 @@ Note::Note(const Note& other) {
 
 // Деструктор
 Note::~Note() {
-    cout << "Вызван деструктор для объекта Note: " << lastName << endl;
+    std::cout << "Вызван деструктор для объекта Note: " << lastName << std::endl;
 }
 
 // Сеттеры
@@ -43,11 +43,11 @@ void Note::setFirstName(std::string fName) {
     firstName = fName;
 }
 
-void Note::setLastName(string lName) {
+void Note::setLastName(std::string lName) {
     lastName = lName;
 }
 
-void Note::setPhoneNumber(string phone) {
+void Note::setPhoneNumber(std::string phone) {
     phoneNumber = phone;
 }
 
@@ -58,13 +58,14 @@ void Note::setBirthday(int day, int month, int year) {
 }
 
 // Геттеры
-string Note::getFirstName() const { return firstName; }
-string Note::getLastName() const { return lastName; }
-string Note::getPhoneNumber() const { return phoneNumber; }
+std::string Note::getFirstName() const { return firstName; }
+std::string Note::getLastName() const { return lastName; }
+std::string Note::getPhoneNumber() const { return phoneNumber; }
 const int* Note::getBirthday() const { return birthday; }
 
 // Оператор присваивания
 Note& Note::operator=(const Note& other) {
+    std::cout << "Вызван оператор присваивания для Note" << std::endl;
     if (this != &other) { // Защита от самоприсваивания
         firstName = other.firstName;
         lastName = other.lastName;
@@ -77,7 +78,7 @@ Note& Note::operator=(const Note& other) {
 }
 
 // Перегрузка вывода (cout << note)
-ostream& operator<<(ostream& os, const Note& note) {
+std::ostream& operator<<(std::ostream& os, const Note& note) {
     os << "Фамилия: " << note.lastName
        << ", Имя: " << note.firstName
        << ", Телефон: " << note.phoneNumber
@@ -86,14 +87,16 @@ ostream& operator<<(ostream& os, const Note& note) {
 }
 
 // Перегрузка ввода (cin >> note)
-istream& operator>>(istream& is, Note& note) {
-    cout << "Введите Фамилию: ";
+std::istream& operator>>(std::istream& is, Note& note) {
+    std::cout << "Введите Фамилию: ";
     is >> note.lastName;
-    cout << "Введите Имя: ";
+    std::cout << "Введите Имя: ";
     is >> note.firstName;
-    cout << "Введите Номер телефона: ";
+    std::cout << "Введите Номер телефона: ";
     is >> note.phoneNumber;
-    cout << "Введите День рождения (День, Месяц, Год через пробел): ";
+    std::cout << "Введите День рождения (День, Месяц, Год через пробел): ";
     is >> note.birthday[0] >> note.birthday[1] >> note.birthday[2];
+    is.ignore(32767, '\n');
+
     return is;
 }

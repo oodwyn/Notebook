@@ -1,16 +1,50 @@
 #include <iostream>
+#include "Keeper.h"
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+void showMenu() {
+    std::cout << "\n--- МЕНЮ ЗАПИСНОЙ КНИЖКИ ---\n";
+    std::cout << "1. Добавить новую запись\n";
+    std::cout << "2. Показать все записи\n";
+    std::cout << "3. Удалить запись\n";
+    std::cout << "4. Создать копию записи\n";
+    std::cout << "5. Сохранить в файл\n";
+    std::cout << "6. Загрузить из файла\n";
+    // Пункт 7 для поиска добавим позже
+    std::cout << "0. Выход\n";
+    std::cout << "Ваш выбор: ";
+}
+
 int main() {
-    // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the <b>lang</b> variable name to see how CLion can help you rename it.
-    auto lang = "C++";
-    std::cout << "Hello and welcome to " << lang << "!\n";
+    setlocale(LC_ALL, "Russian");
+    Keeper notebook;
+    int choice;
 
-    for (int i = 1; i <= 5; i++) {
-        // TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        std::cout << "i = " << i << std::endl;
+    while (true) {
+        showMenu();
+        std::cin >> choice;
+
+        if (std::cin.fail()) {
+            std::cout << "!! Ошибка: введите число.\n";
+            std::cin.clear();
+            std::cin.ignore(32767, '\n');
+            continue;
+        }
+
+        std::cin.ignore(32767, '\n');
+
+        switch (choice) {
+            case 1: notebook.add(); break;
+            case 2: notebook.showAll(); break;
+            case 3: notebook.remove(); break;
+            case 4: notebook.copy(); break;
+            case 5: notebook.saveToFile(); break;
+            case 6: notebook.loadFromFile(); break;
+            case 0:
+                std::cout << "Завершение программы...\n";
+                return 0;
+            default:
+                std::cout << "!! Неверный пункт меню.\n";
+                break;
+        }
     }
-
-    return 0;
-    // TIP See CLion help at <a href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>. Also, you can try interactive lessons for CLion by selecting 'Help | Learn IDE Features' from the main menu.
 }
