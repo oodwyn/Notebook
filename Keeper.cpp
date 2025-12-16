@@ -106,6 +106,24 @@ void Keeper::sort() {
     }
 }
 
+void Keeper::searchByLastName() {
+    if (this->size == 0) { std::cout << "Список пуст" << std::endl; return; }
+
+    std::string searchName;
+    std::cout << "Введите фамилию для поиска: ";
+    std::cin >> searchName;
+
+    bool found = false;
+    for(int i=0; i < this->size; i++) {
+        if(this->data[i]->getLastName() == searchName) {
+            std::cout << "\nНайдено (Запись #" << i+1 << "):" << std::endl;
+            std::cout << *(this->data[i]) << std::endl;
+            found = true;
+        }
+    }
+    if(!found) std::cout << "Человек с такой фамилией не найден" << std::endl;
+}
+
 // Метод удаления
 void Keeper::remove() {
     if (this->size == 0) {
@@ -169,7 +187,7 @@ void Keeper::copy() {
     this->data[this->size] = newCopy;
     this->size++;
 
-    // После добавления копии нужно снова отсортировать массив
+    // После добавления копии нужно отсортировать массив
     this->sort();
 
     std::cout << ">> Копия успешно создана, добавлена и отсортирована" << std::endl;
@@ -177,7 +195,6 @@ void Keeper::copy() {
 
 // Сохранение в файл
 void Keeper::saveToFile() {
-
     std::string filename;
     std::cout << "Введите имя файла для сохранения (например, notebook.txt): ";
     std::getline(std::cin, filename);
@@ -185,90 +202,152 @@ void Keeper::saveToFile() {
 
     std::ofstream outFile(filename);
     if (!outFile.is_open()) {
-        std::cout << "!! ОШИБКА: Не удалось создать/открыть файл для записи: " << filename << std::endl;
+        std::cout << "!! ОШИБКА: Не удалось открыть файл для записи: " << filename << std::endl;
         return;
     }
-
-    // Записываем сначала количество записей
-    outFile << this->size << std::endl;
-
+    // Проходим по всем записям
     for (int i = 0; i < this->size; ++i) {
-        outFile << this->data[i]->getLastName() << std::endl;
-        outFile << this->data[i]->getFirstName() << std::endl;
-        outFile << this->data[i]->getPhoneNumber() << std::endl;
+        outFile << "--- Note ---" << std::endl;
+        outFile << "FirstName: " << this->data[i]->getFirstName() << std::endl;
+        outFile << "LastName: " << this->data[i]->getLastName() << std::endl;
+        outFile << "Phone: " << this->data[i]->getPhoneNumber() << std::endl;
+
         const int* bd = this->data[i]->getBirthday();
-        outFile << bd[0] << " " << bd[1] << " " << bd[2] << std::endl;
+        outFile << "Birthday: " << bd[0] << "." << bd[1] << "." << bd[2] << std::endl;
+
+        outFile << "--- End ---" << std::endl;
     }
 
     outFile.close();
-    std::cout << ">> Данные успешно сохранены в файл " << filename << std::endl;
+    std::cout << ">> Данные успешно сохранены в красивом формате в " << filename << std::endl;
 }
 
+// Загружаем из файла
 void Keeper::loadFromFile() {
-#include <fstream>
-
     std::string filename;
     std::cout << "Введите имя файла для загрузки: ";
     std::getline(std::cin, filename);
 
     std::ifstream inFile(filename);
     if (!inFile.is_open()) {
-        std::cout << "!! ОШИБКА: Не удалось открыть файл для чтения: " << filename << std::endl;
+        std::cout << "!! ОШИБКА: Не удалось открыть файл: " << filename << std::endl;
         return;
     }
 
+    // Спрашиваем, очистить ли текущий список
     if (this->size > 0) {
         int choice;
-        std::cout << "\n!! В памяти уже есть данные.\n1. Добавить\n2. Заменить\n0. Отмена\nВаш выбор: ";
+        std::cout << "\n!! В памяти уже есть данные.\n1. Добавить к ним\n2. Заменить (удалить старые)\nВаш выбор: ";
         std::cin >> choice;
         std::cin.ignore(32767, '\n');
 
         if (choice == 2) {
-            for (int i = 0; i < this->size; ++i) { delete this->data[i]; }
+            for (int i = 0; i < this->size; ++i) delete this->data[i];
             this->size = 0;
-        } else if (choice != 1) {
-            std::cout << ">> Загрузка отменена" << std::endl;
-            inFile.close();
-            return;
+            std::cout << ">> Старые данные очищены" << std::endl;
         }
     }
 
-    int recordCount;
-    inFile >> recordCount;
-    if (inFile.fail()) {
-        std::cout << ">> Файл пуст или поврежден" << std::endl;
-        inFile.close();
-        return;
-    }
-    inFile.ignore();
+    std::string line;
 
-    for (int i = 0; i < recordCount; ++i) {
-        if (this->size >= this->capacity) { // Расширение
-            int newCapacity = this->capacity * 2;
-            Note** newData = new Note*[newCapacity];
-            for (int j = 0; j < this->size; ++j) { newData[j] = this->data[j]; }
-            delete[] this->data;
-            this->data = newData;
-            this->capacity = newCapacity;
+    // Временные переменные
+    std::string tempFName, tempLName, tempPhone;
+    int tempD = 0, tempM = 0, tempY = 0;
+
+    bool insideNote = false;
+
+    while (std::getline(inFile, line)) {
+        // Убираем возможный символ возврата каретки \r
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+
+        if (line == "--- Note ---") {
+            insideNote = true;
+            // Сбрасываем переменные
+            tempFName = ""; tempLName = ""; tempPhone = "";
+            tempD = 0; tempM = 0; tempY = 0;
+            continue;
         }
 
-        std::string lName, fName, phone;
-        int d, m, y;
+        if (line == "--- End ---") {
+            if (insideNote) {
+                if (this->size >= this->capacity) {
+                    int newCapacity = this->capacity * 2;
+                    Note** newData = new Note*[newCapacity];
+                    for (int j = 0; j < this->size; ++j) newData[j] = this->data[j];
+                    delete[] this->data;
+                    this->data = newData;
+                    this->capacity = newCapacity;
+                }
 
-        std::getline(inFile, lName);
-        std::getline(inFile, fName);
-        std::getline(inFile, phone);
-        inFile >> d >> m >> y;
-        inFile.ignore();
+                Note* newNote = new Note(tempFName, tempLName, tempPhone, tempD, tempM, tempY);
 
-        if (inFile.fail()) continue; // Если чтение не удалось, пропускаем запись
+                this->data[this->size] = newNote;
+                this->size++;
 
-        this->data[this->size++] = new Note(lName, fName, phone, d, m, y);
+                insideNote = false;
+            }
+            continue;
+        }
+
+        if (insideNote) {
+            // Ищем ключевые слова и вырезаем значения
+            // substr(N) берет строку начиная с N-го символа
+            if (line.find("FirstName: ") == 0) {
+                tempFName = line.substr(11);
+            }
+            else if (line.find("LastName: ") == 0) {
+                tempLName = line.substr(10);
+            }
+            else if (line.find("Phone: ") == 0) {
+                tempPhone = line.substr(7);
+            }
+            else if (line.find("Birthday: ") == 0) {
+                std::string dateStr = line.substr(10);
+                sscanf(dateStr.c_str(), "%d.%d.%d", &tempD, &tempM, &tempY);
+            }
+        }
     }
-
-    // После загрузки всех данных ОБЯЗАТЕЛЬНО сортируем весь массив
-    this->sort();
 
     inFile.close();
-    std::cout << ">> Данные успешно загружены и отсортированы." << std::endl;
+    // Сортируем после загрузки
+    this->sort();
+
+    std::cout << ">> Данные загружены. Всего записей: " << this->size << std::endl;
+}
+
+// Для запуска задания
+void Keeper::run() {
+    int choice;
+    do {
+        std::cout << "\n--- МЕНЮ ЗАПИСНОЙ КНИЖКИ (Keeper) ---\n";
+        std::cout << "1. Добавить новую запись\n";
+        std::cout << "2. Показать все записи\n";
+        std::cout << "3. Удалить запись\n";
+        std::cout << "4. Создать копию записи\n";
+        std::cout << "5. Сохранить в файл\n";
+        std::cout << "6. Загрузить из файла\n";
+        std::cout << "7. Поиск по фамилии\n";
+        std::cout << "0. Назад в главное меню\n";
+        std::cout << "Ваш выбор: ";
+
+        std::cin >> choice;
+        if(std::cin.fail()) {
+            std::cin.clear(); std::cin.ignore(32767, '\n');
+            choice = -1;
+        } else {
+            std::cin.ignore(32767, '\n'); // Очистка буфера
+        }
+
+        switch (choice) {
+            case 1: add(); break;
+            case 2: showAll(); break;
+            case 3: remove(); break;
+            case 4: copy(); break;
+            case 5: saveToFile(); break;
+            case 6: loadFromFile(); break;
+            case 7: searchByLastName(); break;
+            case 0: break;
+            default: std::cout << "Неверный ввод.\n";
+        }
+    } while (choice != 0);
 }

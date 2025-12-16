@@ -23,5 +23,7 @@ public:
     void saveToFile();
     void loadFromFile();
     void copy();
+
+    void run();
 };
 #endif

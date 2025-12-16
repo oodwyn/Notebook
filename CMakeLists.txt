@@ -7,4 +7,6 @@ add_executable(Lab2_Notebook main.cpp
         Note.cpp
         Note.h
         Keeper.h
-        Keeper.cpp)
+        Keeper.cpp
+        task2.cpp
+        task2.h)

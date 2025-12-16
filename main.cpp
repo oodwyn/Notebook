@@ -1,50 +1,83 @@
-#include <iostream>
+#include <limits> // Очистка ввода
 #include "Keeper.h"
+#include "Task2.h"
 
-void showMenu() {
-    std::cout << "\n--- МЕНЮ ЗАПИСНОЙ КНИЖКИ ---\n";
-    std::cout << "1. Добавить новую запись\n";
-    std::cout << "2. Показать все записи\n";
-    std::cout << "3. Удалить запись\n";
-    std::cout << "4. Создать копию записи\n";
-    std::cout << "5. Сохранить в файл\n";
-    std::cout << "6. Загрузить из файла\n";
-    // Пункт 7 для поиска добавим позже
-    std::cout << "0. Выход\n";
-    std::cout << "Ваш выбор: ";
-}
+using namespace std;
 
-int main() {
-    setlocale(LC_ALL, "Russian");
-    Keeper notebook;
-    int choice;
+// Меню для Блокнота (Задание 1)
+void runKeeperMenu(Keeper& notebook) {
+    int subChoice;
+    do {
+        cout << "\n--- [МЕНЮ ЗАДАНИЯ 1: Блокнот] ---\n";
+        cout << "1. Добавить запись\n";
+        cout << "2. Показать все записи\n";
+        cout << "3. Удалить запись\n";
+        cout << "4. Копировать запись\n";
+        cout << "5. Сохранить в файл\n";
+        cout << "6. Загрузить из файла\n";
+        cout << "7. Поиск по фамилии\n";
+        cout << "0. Назад в главное меню\n";
+        cout << "Ваш выбор: ";
 
-    while (true) {
-        showMenu();
-        std::cin >> choice;
-
-        if (std::cin.fail()) {
-            std::cout << "!! Ошибка: введите число.\n";
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
-            continue;
+        if (!(cin >> subChoice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            subChoice = -1;
+        } else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Убираем лишний энтер
         }
 
-        std::cin.ignore(32767, '\n');
-
-        switch (choice) {
+        switch (subChoice) {
             case 1: notebook.add(); break;
             case 2: notebook.showAll(); break;
             case 3: notebook.remove(); break;
             case 4: notebook.copy(); break;
             case 5: notebook.saveToFile(); break;
             case 6: notebook.loadFromFile(); break;
-            case 0:
-                std::cout << "Завершение программы...\n";
-                return 0;
-            default:
-                std::cout << "!! Неверный пункт меню.\n";
-                break;
+            case 7: notebook.searchByLastName(); break; // Убедись, что метод есть в Keeper
+            case 0: cout << "Возврат в главное меню...\n"; break;
+            default: cout << "Неверный пункт\n";
         }
-    }
+    } while (subChoice != 0);
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian"); // Русский язык
+
+    // Создаем объект Keeper здесь, чтобы данные не пропадали
+    // пока мы переключаемся между заданиями
+    Keeper notebook;
+
+    int mainChoice;
+    do {
+        cout << "\n====== ГЛАВНОЕ МЕНЮ ======" << endl;
+        cout << "1. Задание 1 (Класс Note)" << endl;
+        cout << "2. Задание 2 (Обработка текста)" << endl;
+        cout << "0. Выход из программы" << endl;
+        cout << "Ваш выбор: ";
+
+        if (!(cin >> mainChoice)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            mainChoice = -1;
+        }
+
+        switch (mainChoice) {
+            case 1:
+                // Заходим в подменю блокнота
+                runKeeperMenu(notebook);
+                break;
+            case 2:
+                // Запускаем второе задание
+                runTask2();
+                break;
+            case 0:
+                cout << "До свидания!\n";
+                break;
+            default:
+                cout << "Такого пункта нет.\n";
+        }
+    } while (mainChoice != 0);
+
+    return 0;
 }

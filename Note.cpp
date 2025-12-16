@@ -13,7 +13,7 @@ Note::Note() {
 
 // Конструктор с параметрами
 Note::Note(std::string fName, std::string lName, std::string phone, int day, int month, int year) {
-    std::cout << "Вызван конструктор с параметрами для объекта Node" << std::endl;
+    std::cout << "Вызван конструктор с параметрами для объекта Note" << std::endl;
     firstName = fName;
     lastName = lName;
     phoneNumber = phone;
