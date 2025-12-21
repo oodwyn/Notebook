@@ -17,6 +17,7 @@ public:
 
     void add();
     void showAll();
+    void editNote();
     void remove();
     void searchByLastName();
 

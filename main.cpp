@@ -4,7 +4,6 @@
 
 using namespace std;
 
-// Меню для Блокнота (Задание 1)
 void runKeeperMenu(Keeper& notebook) {
     int subChoice;
     do {
@@ -16,6 +15,7 @@ void runKeeperMenu(Keeper& notebook) {
         cout << "5. Сохранить в файл\n";
         cout << "6. Загрузить из файла\n";
         cout << "7. Поиск по фамилии\n";
+        cout << "8. Редактировать запись\n";
         cout << "0. Назад в главное меню\n";
         cout << "Ваш выбор: ";
 
@@ -34,7 +34,8 @@ void runKeeperMenu(Keeper& notebook) {
             case 4: notebook.copy(); break;
             case 5: notebook.saveToFile(); break;
             case 6: notebook.loadFromFile(); break;
-            case 7: notebook.searchByLastName(); break; // Убедись, что метод есть в Keeper
+            case 7: notebook.searchByLastName(); break;
+            case 8: notebook.editNote(); break;
             case 0: cout << "Возврат в главное меню...\n"; break;
             default: cout << "Неверный пункт\n";
         }
@@ -42,10 +43,7 @@ void runKeeperMenu(Keeper& notebook) {
 }
 
 int main() {
-    setlocale(LC_ALL, "Russian"); // Русский язык
-
-    // Создаем объект Keeper здесь, чтобы данные не пропадали
-    // пока мы переключаемся между заданиями
+    setlocale(LC_ALL, "Russian");
     Keeper notebook;
 
     int mainChoice;
@@ -64,11 +62,9 @@ int main() {
 
         switch (mainChoice) {
             case 1:
-                // Заходим в подменю блокнота
                 runKeeperMenu(notebook);
                 break;
             case 2:
-                // Запускаем второе задание
                 runTask2();
                 break;
             case 0:

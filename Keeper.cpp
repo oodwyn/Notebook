@@ -151,6 +151,97 @@ void Keeper::remove() {
     std::cout << ">> Запись #" << index + 1 << " успешно удалена." << std::endl;
 }
 
+// Редактирование
+void Keeper::editNote() {
+    if (this->size == 0) {
+        std::cout << "!! Список пуст, редактировать некого." << std::endl;
+        return;
+    }
+
+    this->showAll();
+
+    int index;
+    std::cout << "Введите номер записи для редактирования: ";
+    std::cin >> index;
+
+    // Проверка на ошибки ввода
+    if (std::cin.fail()) {
+        std::cin.clear(); std::cin.ignore(32767, '\n');
+        std::cout << "!! Ошибка ввода числа." << std::endl;
+        return;
+    }
+
+    index--;
+
+    if (index < 0 || index >= this->size) {
+        std::cout << "!! Неверный номер записи." << std::endl;
+        return;
+    }
+
+    Note* currentNote = this->data[index];
+    int fieldChoice;
+
+    do {
+        std::cout << "\n--- Редактирование записи #" << index + 1 << " ---" << std::endl;
+        std::cout << "Текущие данные: " << *currentNote << std::endl;
+        std::cout << "Выберите поле для изменения:" << std::endl;
+        std::cout << "1. Фамилия" << std::endl;
+        std::cout << "2. Имя" << std::endl;
+        std::cout << "3. Номер телефона" << std::endl;
+        std::cout << "4. Дата рождения" << std::endl;
+        std::cout << "0. Завершить редактирование" << std::endl;
+        std::cout << "Ваш выбор: ";
+
+        std::cin >> fieldChoice;
+        std::cin.ignore(32767, '\n'); // Очистка буфера
+
+        switch (fieldChoice) {
+            case 1: {
+                std::string newLastName;
+                std::cout << "Введите новую фамилию: ";
+                std::cin >> newLastName;
+                currentNote->setLastName(newLastName);
+                std::cout << ">> Фамилия изменена" << std::endl;
+                break;
+            }
+            case 2: {
+                std::string newFirstName;
+                std::cout << "Введите новое имя: ";
+                std::cin >> newFirstName;
+                currentNote->setFirstName(newFirstName);
+                std::cout << ">> Имя изменено" << std::endl;
+                break;
+            }
+            case 3: {
+                std::string newPhone;
+                std::cout << "Введите новый телефон: ";
+                std::cin >> newPhone;
+                currentNote->setPhoneNumber(newPhone);
+                std::cout << ">> Телефон изменен" << std::endl;
+                break;
+            }
+            case 4: {
+                int d, m, y;
+                std::cout << "Введите новую дату рождения (Д М Г через пробел): ";
+                std::cin >> d >> m >> y;
+                currentNote->setBirthday(d, m, y);
+                std::cout << ">> Дата изменена" << std::endl;
+                break;
+            }
+            case 0:
+                std::cout << "Завершение редактирования" << std::endl;
+                break;
+            default:
+                std::cout << "!! Неверный выбор" << std::endl;
+        }
+
+    } while (fieldChoice != 0);
+
+    // Сортировка
+    this->sort();
+    std::cout << ">> Список пересортирован" << std::endl;
+}
+
 // Метод копирования
 void Keeper::copy() {
     if (this->size == 0) {
