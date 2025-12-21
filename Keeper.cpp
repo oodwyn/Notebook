@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdexcept>
 
 Keeper::Keeper() {
     this->capacity = 4;
@@ -127,23 +128,28 @@ void Keeper::searchByLastName() {
 // Метод удаления
 void Keeper::remove() {
     if (this->size == 0) {
-        std::cout << "!! Записная книжка пуста, удалять нечего" << std::endl;
-        return;
+        // Исключение
+        throw std::runtime_error("Записная книжка пуста, удалять нечего");
     }
-    showAll();
+
+    this->showAll();
+
     int index;
     std::cout << "Введите номер записи для удаления: ";
     std::cin >> index;
-    std::cin.ignore(32767, '\n');
+
+    if(std::cin.fail()) {
+        std::cin.clear(); std::cin.ignore(32767, '\n');
+        throw std::invalid_argument("Введено не число!");
+    }
+
     index--;
 
     if (index < 0 || index >= this->size) {
-        std::cout << "!! Неверный номер записи" << std::endl;
-        return;
+        throw std::out_of_range("Неверный номер записи (выход за пределы массива).");
     }
 
     delete this->data[index];
-
     for (int i = index; i < this->size - 1; ++i) {
         this->data[i] = this->data[i + 1];
     }
@@ -245,43 +251,41 @@ void Keeper::editNote() {
 // Метод копирования
 void Keeper::copy() {
     if (this->size == 0) {
-        std::cout << "!! Список пуст, копировать нечего" << std::endl;
-        return;
+        throw std::runtime_error("Список пуст, копировать нечего");
     }
+
+    // Расширение памяти
     if (this->size >= this->capacity) {
-        std::cout << "!! Вместимость хранилища недостаточна. Расширяем..." << std::endl;
         int newCapacity = this->capacity * 2;
         Note** newData = new Note*[newCapacity];
-        for (int j = 0; j < this->size; ++j) { newData[j] = this->data[j]; }
+        for (int j = 0; j < this->size; ++j) newData[j] = this->data[j];
         delete[] this->data;
         this->data = newData;
         this->capacity = newCapacity;
     }
 
-    showAll();
+    this->showAll();
     int index;
-    std::cout << "Введите номер записи, которую нужно скопировать: ";
+    std::cout << "Введите номер записи для копирования: ";
     std::cin >> index;
-    std::cin.ignore(32767, '\n');
+
+    if(std::cin.fail()) {
+        std::cin.clear(); std::cin.ignore(32767, '\n');
+        throw std::invalid_argument("Введено не число!");
+    }
+
     index--;
 
     if (index < 0 || index >= this->size) {
-        std::cout << "!! Неверный номер записи" << std::endl;
-        return;
+        throw std::out_of_range("Неверный номер записи");
     }
 
-    Note* original = this->data[index];
-
-    // Вызываем конструктор копирования Note
-    Note* newCopy = new Note(*original);
-
+    Note* newCopy = new Note(*(this->data[index])); // Конструктор копирования
     this->data[this->size] = newCopy;
     this->size++;
-
-    // После добавления копии нужно отсортировать массив
     this->sort();
 
-    std::cout << ">> Копия успешно создана, добавлена и отсортирована" << std::endl;
+    std::cout << ">> Копия создана" << std::endl;
 }
 
 // Сохранение в файл
@@ -310,7 +314,7 @@ void Keeper::saveToFile() {
     }
 
     outFile.close();
-    std::cout << ">> Данные успешно сохранены в красивом формате в " << filename << std::endl;
+    std::cout << ">> Данные успешно сохранены в " << filename << std::endl;
 }
 
 // Загружаем из файла

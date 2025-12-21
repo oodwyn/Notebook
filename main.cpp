@@ -24,21 +24,28 @@ void runKeeperMenu(Keeper& notebook) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             subChoice = -1;
         } else {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Убираем лишний энтер
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
-        switch (subChoice) {
-            case 1: notebook.add(); break;
-            case 2: notebook.showAll(); break;
-            case 3: notebook.remove(); break;
-            case 4: notebook.copy(); break;
-            case 5: notebook.saveToFile(); break;
-            case 6: notebook.loadFromFile(); break;
-            case 7: notebook.searchByLastName(); break;
-            case 8: notebook.editNote(); break;
-            case 0: cout << "Возврат в главное меню...\n"; break;
-            default: cout << "Неверный пункт\n";
+        try {
+            switch (subChoice) {
+                case 1: notebook.add(); break;
+                case 2: notebook.showAll(); break;
+                case 3: notebook.remove(); break;
+                case 4: notebook.copy(); break;
+                case 5: notebook.saveToFile(); break;
+                case 6: notebook.loadFromFile(); break;
+                case 7: notebook.searchByLastName(); break;
+                case 8: notebook.editNote(); break;
+                case 0: cout << "Возврат в главное меню...\n"; break;
+                default: cout << "Неверный пункт.\n";
+            }
         }
+        catch (const std::exception& e) {
+            cout << "\n !! Исключение" << endl;
+            cout << "Описание ошибки: " << e.what() << endl;
+        }
+
     } while (subChoice != 0);
 }
 
